@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>NES Controller</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #555;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    .controller {
+      display: flex;
+      flex-direction: row;
+      gap: 40px;
+      background: #ccc;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .dpad {
+      display: grid;
+      grid-template-areas:
+        ". up ."
+        "left center right"
+        ". down .";
+      gap: 10px;
+    }
+    .btn {
+      width: 60px;
+      height: 60px;
+      background: #333;
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      touch-action: none;
+      font-size: 20px;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+    .round {
+      width: 70px;
+      height: 70px;
+      background: red;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+    .start-select {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .oval {
+      width: 80px;
+      height: 40px;
+      background: #333;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controller">
+    <!-- D-pad -->
+    <div class="dpad">
+      <div></div>
+      <div class="btn" data-action="up">▲</div>
+      <div></div>
+      <div class="btn" data-action="left">◀</div>
+      <div class="btn" data-action="center"></div>
+      <div class="btn" data-action="right">▶</div>
+      <div></div>
+      <div class="btn" data-action="down">▼</div>
+      <div></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <div class="round btn" data-action="jump">A</div>
+      <div class="round btn" data-action="shoot">B</div>
+    </div>
+  </div>
+
+  <div class="start-select">
+    <div class="oval btn" data-action="select">Select</div>
+    <div class="oval btn" data-action="pause">Start</div>
+  </div>
+
+  <script>
+    // Dynamic WebSocket URL for both local and production
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}`;
+    const socket = new WebSocket(wsUrl);
+    
+    socket.onopen = () => {
+      console.log("Connected to server as controller");
+      socket.send("register:controller");
+    };
+    
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+    
+    socket.onclose = () => {
+      console.log("Disconnected from server");
+    };
+
+    function send(action) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(action);
+      }
+    }
+
+    document.querySelectorAll(".btn").forEach(btn => {
+      const action = btn.dataset.action;
+      if (!action) return;
+
+      // Desktop
+      btn.addEventListener("mousedown", () => send(action + "_down"));
+      btn.addEventListener("mouseup", () => send(action + "_up"));
+      btn.addEventListener("mouseleave", () => send(action + "_up"));
+
+      // Mobile
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        send(action + "_down");
+      }, { passive: false });
+
+      btn.addEventListener("touchend", e => {
+        e.preventDefault();
+        send(action + "_up");
+      });
+    });
+  </script>
+</body>
+</html>
