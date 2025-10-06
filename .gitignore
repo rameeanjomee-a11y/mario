@@ -5,6 +5,5 @@ npm-debug.log
 *.log
 .vscode/
 .idea/
-package-lock.json
 
 
