@@ -13,10 +13,8 @@ RUN npm ci --only=production
 # Copy application files
 COPY server.js ./
 COPY controller.html ./
+COPY liara.json ./
 COPY FullScreenMario-master ./FullScreenMario-master
-
-# Expose port (most cloud services use 3000, but can be overridden)
-EXPOSE 3000
 
 # Set environment variable for production
 ENV NODE_ENV=production
