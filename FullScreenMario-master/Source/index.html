@@ -203,7 +203,8 @@
     <!-- Loading Screen Handler -->
     <script>
       window.addEventListener('load', function() {
-        // Wait a bit to ensure game is initialized
+        // Wait longer to ensure all game resources and scripts are fully initialized
+        // This prevents lag by keeping the loading screen until everything is ready
         setTimeout(function() {
           const loadingScreen = document.getElementById('loading-screen');
           loadingScreen.classList.add('hidden');
@@ -211,7 +212,7 @@
           setTimeout(function() {
             loadingScreen.style.display = 'none';
           }, 500);
-        }, 500);
+        }, 3000); // Increased to 3 seconds to allow proper initialization
       });
     </script>
 </body>
