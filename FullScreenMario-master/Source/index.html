@@ -14,6 +14,19 @@
 </head>
 
 <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-mario">🍄</div>
+            <div class="loading-text">LOADING GAME</div>
+            <div class="loading-spinner">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
     <header>
         <img src="Theme/Header.gif" alt="FullScreenMario.com" />
         <div id="header-right">
@@ -185,6 +198,21 @@
           document.body.dispatchEvent(upEvent);
         }
       }
+    </script>
+
+    <!-- Loading Screen Handler -->
+    <script>
+      window.addEventListener('load', function() {
+        // Wait a bit to ensure game is initialized
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('loading-screen');
+          loadingScreen.classList.add('hidden');
+          // Remove from DOM after fade out
+          setTimeout(function() {
+            loadingScreen.style.display = 'none';
+          }, 500);
+        }, 500);
+      });
     </script>
 </body>
 </html>
