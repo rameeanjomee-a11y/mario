@@ -11,6 +11,9 @@
     <!-- /build -->
 
     <link rel="shortcut icon" href="Theme/Mario.gif">
+    
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -23,6 +26,11 @@
                 <span></span>
                 <span></span>
                 <span></span>
+            </div>
+            <div class="qr-container">
+                <div class="qr-title">SCAN TO PLAY WITH YOUR PHONE</div>
+                <div id="qrcode"></div>
+                <div class="qr-url" id="controller-url"></div>
             </div>
         </div>
     </div>
@@ -46,6 +54,16 @@
     <section id="controls"></section>
     <section id="explanation" class="section-text">
         FullScreenMario is a free HTML5 remake of Nintendo's original Super Mario Bros.
+    </section>
+    
+    <!-- Permanent QR Code Section -->
+    <section id="qr-section" class="section-text">
+        <div class="qr-permanent-container">
+            <h2 class="qr-permanent-title">🎮 PLAY WITH YOUR PHONE</h2>
+            <p class="qr-permanent-description">Scan this QR code with your phone to use it as a remote controller!</p>
+            <div id="qrcode-permanent"></div>
+            <div class="qr-permanent-url" id="controller-url-permanent"></div>
+        </div>
     </section>
 
     <!-- Mario Engine Scripts -->
@@ -197,6 +215,41 @@
           const upEvent = new KeyboardEvent("keyup", { keyCode: code, which: code, bubbles: true });
           document.body.dispatchEvent(upEvent);
         }
+      }
+    </script>
+
+    <!-- QR Code Generator -->
+    <script>
+      // Generate QR code for controller URL
+      const controllerUrl = window.location.protocol + '//' + window.location.host + '/';
+      
+      // Wait for QRCode library to load
+      if (typeof QRCode !== 'undefined') {
+        // QR code for loading screen
+        new QRCode(document.getElementById("qrcode"), {
+          text: controllerUrl,
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        document.getElementById("controller-url").textContent = controllerUrl;
+        
+        // QR code for permanent section (create after DOM loads)
+        window.addEventListener('DOMContentLoaded', function() {
+          new QRCode(document.getElementById("qrcode-permanent"), {
+            text: controllerUrl,
+            width: 250,
+            height: 250,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          document.getElementById("controller-url-permanent").textContent = controllerUrl;
+        });
+      } else {
+        console.error('QRCode library not loaded');
       }
     </script>
 

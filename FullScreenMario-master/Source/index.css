@@ -65,6 +65,72 @@
     40% { transform: scale(1); }
 }
 
+.qr-container {
+    margin-top: 40px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.qr-title {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-shadow: none;
+}
+
+.qr-url {
+    color: #666;
+    font-size: 10px;
+    margin-top: 10px;
+    word-break: break-all;
+    text-shadow: none;
+}
+
+/* Permanent QR Code Section */
+#qr-section {
+    background: #1a1a1a;
+    padding: 40px 20px;
+    margin-top: 30px;
+}
+
+.qr-permanent-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.qr-permanent-title {
+    font-size: 28px;
+    color: #5c94fc;
+    margin-bottom: 15px;
+    font-family: 'Press Start', monospace;
+}
+
+.qr-permanent-description {
+    font-size: 16px;
+    color: #ccc;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+#qrcode-permanent {
+    display: inline-block;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(92, 148, 252, 0.3);
+}
+
+.qr-permanent-url {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #5c94fc;
+    word-break: break-all;
+    font-family: monospace;
+}
+
 /* General elements */
 
 html, body {
