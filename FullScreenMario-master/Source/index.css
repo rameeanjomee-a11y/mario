@@ -89,46 +89,12 @@
 }
 
 /* Permanent QR Code Section */
-#qr-section {
-    background: #1a1a1a;
-    padding: 40px 20px;
-    margin-top: 30px;
-}
-
-.qr-permanent-container {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.qr-permanent-title {
-    font-size: 28px;
-    color: #5c94fc;
-    margin-bottom: 15px;
-    font-family: 'Press Start', monospace;
-}
-
-.qr-permanent-description {
-    font-size: 16px;
-    color: #ccc;
-    margin-bottom: 30px;
-    line-height: 1.6;
-}
-
 #qrcode-permanent {
     display: inline-block;
-    padding: 20px;
+    margin-top: 15px;
+    padding: 10px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(92, 148, 252, 0.3);
-}
-
-.qr-permanent-url {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #5c94fc;
-    word-break: break-all;
-    font-family: monospace;
+    border-radius: 8px;
 }
 
 /* General elements */

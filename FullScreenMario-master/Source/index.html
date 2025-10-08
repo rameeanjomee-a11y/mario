@@ -53,17 +53,8 @@
     <section id="game"></section>
     <section id="controls"></section>
     <section id="explanation" class="section-text">
-        FullScreenMario is a free HTML5 remake of Nintendo's original Super Mario Bros.
-    </section>
-    
-    <!-- Permanent QR Code Section -->
-    <section id="qr-section" class="section-text">
-        <div class="qr-permanent-container">
-            <h2 class="qr-permanent-title">🎮 PLAY WITH YOUR PHONE</h2>
-            <p class="qr-permanent-description">Scan this QR code with your phone to use it as a remote controller!</p>
-            <div id="qrcode-permanent"></div>
-            <div class="qr-permanent-url" id="controller-url-permanent"></div>
-        </div>
+        Play with your phone
+        <div id="qrcode-permanent"></div>
     </section>
 
     <!-- Mario Engine Scripts -->
@@ -240,13 +231,12 @@
         window.addEventListener('DOMContentLoaded', function() {
           new QRCode(document.getElementById("qrcode-permanent"), {
             text: controllerUrl,
-            width: 250,
-            height: 250,
+            width: 100,
+            height: 100,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
           });
-          document.getElementById("controller-url-permanent").textContent = controllerUrl;
         });
       } else {
         console.error('QRCode library not loaded');
