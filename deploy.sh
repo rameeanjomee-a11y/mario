@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Deployment script for Mario Remote Controller
+# Deployment script for Multi-Game Remote Controller Platform
 
-echo "🎮 Deploying Mario Remote Controller..."
+echo "🎮 Deploying Multi-Game Remote Controller Platform..."
 
 # Initialize git if not already
 if [ ! -d .git ]; then
@@ -16,11 +16,12 @@ git add .
 
 # Commit
 echo "Committing changes..."
-git commit -m "Initial commit: Mario Remote Controller with Docker support"
+git commit -m "Multi-game platform: Mario & Ninja Frogs with remote controllers"
 
-# Add remote
-echo "Adding remote repository..."
-git remote add origin git@github.com:rameeanjomee-a11y/mario.git
+# Add remote (update if needed)
+# Uncomment and update if remote doesn't exist
+# echo "Adding remote repository..."
+# git remote add origin git@github.com:rameeanjomee-a11y/mario.git
 
 # Push to main branch
 echo "Pushing to GitHub..."
@@ -30,12 +31,18 @@ git push -u origin main
 echo "✅ Deployment complete!"
 echo ""
 echo "Next steps:"
-echo "1. Go to your cloud platform (Railway, Render, etc.)"
+echo "1. Go to your cloud platform (Railway, Render, Liara, etc.)"
 echo "2. Connect to GitHub repository: rameeanjomee-a11y/mario"
 echo "3. The platform will auto-detect the Dockerfile and deploy"
 echo ""
 echo "Your app will be available at:"
-echo "  - Controller: https://your-app-url.com/"
-echo "  - Game: https://your-app-url.com/game"
+echo "🎮 Mario Game:"
+echo "  - Controller: https://your-app-url.com/controller"
+echo "  - Game: https://your-app-url.com/mario"
+echo ""
+echo "🐸 Ninja Frogs Game (2 Players):"
+echo "  - Controller P1: https://your-app-url.com/controller2"
+echo "  - Controller P2: https://your-app-url.com/controller3"
+echo "  - Game: https://your-app-url.com/frogs"
 
 

@@ -1,12 +1,12 @@
 {
   "name": "remote-controller-game",
-  "version": "1.0.0",
-  "description": "Full Screen Mario with Remote Controller",
+  "version": "2.0.0",
+  "description": "Multi-game platform with remote controllers - Mario & Ninja Frogs",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["game", "mario", "remote-controller", "websocket"],
+  "keywords": ["game", "mario", "ninja-frogs", "remote-controller", "websocket", "multiplayer"],
   "author": "",
   "license": "ISC",
   "dependencies": {

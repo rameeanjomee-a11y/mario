@@ -369,8 +369,8 @@
     const socket = new WebSocket(wsUrl);
     
     socket.onopen = () => {
-      console.log("Connected to server as controller");
-      socket.send("register:controller");
+      console.log("Connected to server as mario controller");
+      socket.send("register:controller:mario");
     };
     
     socket.onerror = (error) => {
@@ -383,7 +383,7 @@
 
     function send(action) {
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send(action);
+        socket.send("mario:" + action);
       }
     }
 

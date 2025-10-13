@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ninja Frogs Controller</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* Rotation Warning */
+    #rotate-warning {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    #rotate-warning.show {
+      display: flex;
+    }
+
+    .rotate-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: rotate 2s infinite;
+    }
+
+    @keyframes rotate {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+
+    .rotate-text {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Ninja Frogs Controller */
+    .controller {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(145deg, #27ae60, #229954);
+      border-radius: 30px;
+      box-shadow: 
+        inset 0 -5px 15px rgba(0,0,0,0.4),
+        inset 0 5px 15px rgba(255,255,255,0.1),
+        0 10px 40px rgba(0,0,0,0.5);
+      position: relative;
+      padding: 40px;
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .controller.show {
+      display: grid;
+    }
+
+    /* D-Pad Section (Left) */
+    .dpad-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .dpad {
+      display: grid;
+      grid-template-areas:
+        ". up ."
+        "left center right"
+        ". down .";
+      gap: 3px;
+      background: transparent;
+      padding: 5px;
+    }
+
+    .dpad-btn {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(145deg, #1e8449, #145a32);
+      color: #fff;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      touch-action: none;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    }
+
+    .dpad-btn:active {
+      background: linear-gradient(145deg, #145a32, #1e8449);
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
+      transform: translateY(2px);
+    }
+
+    .dpad-btn[data-action="up"] { grid-area: up; border-radius: 8px; }
+    .dpad-btn[data-action="down"] { grid-area: down; border-radius: 8px; }
+    .dpad-btn[data-action="left"] { grid-area: left; border-radius: 8px; }
+    .dpad-btn[data-action="right"] { grid-area: right; border-radius: 8px; }
+    .dpad-btn[data-action="center"] { 
+      grid-area: center; 
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* Center Section (Game Title) */
+    .center-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .frog-emoji {
+      font-size: 60px;
+      animation: hop 1s ease-in-out infinite;
+    }
+
+    @keyframes hop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Action Buttons Section (Right) */
+    .actions-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .actions {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+    }
+
+    .action-btn {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(145deg, #f39c12, #d68910);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      user-select: none;
+      touch-action: none;
+      box-shadow: 
+        0 6px 12px rgba(0,0,0,0.4),
+        inset 0 -2px 6px rgba(0,0,0,0.3),
+        inset 0 2px 6px rgba(255,255,255,0.2);
+    }
+
+    .action-btn:active {
+      background: linear-gradient(145deg, #d68910, #f39c12);
+      box-shadow: 
+        0 3px 6px rgba(0,0,0,0.4),
+        inset 0 3px 10px rgba(0,0,0,0.5);
+      transform: translateY(3px);
+    }
+
+    .action-btn.use {
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+    }
+
+    .action-btn.use:active {
+      background: linear-gradient(145deg, #c0392b, #e74c3c);
+    }
+
+    /* Connection Status */
+    .status {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: #3498db;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #3498db;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Fullscreen Button */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.1);
+    }
+
+    .fullscreen-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <!-- Rotation Warning -->
+  <div id="rotate-warning">
+    <div class="rotate-icon">📱</div>
+    <div class="rotate-text">Please rotate your device to landscape mode</div>
+  </div>
+
+  <!-- Ninja Frogs Controller -->
+  <div class="controller" id="controller">
+    <!-- Left: Movement Controls -->
+    <div class="dpad-section">
+      <div class="dpad">
+        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="up">W ▲</button>
+        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="left">A ◀</button>
+        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="right">D ▶</button>
+        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="down">S ▼</button>
+        <div class="dpad-btn" data-action="center"></div>
+      </div>
+    </div>
+
+    <!-- Center: Logo -->
+    <div class="center-section">
+      <div class="frog-emoji">🐸</div>
+      <div class="logo">NINJA FROGS</div>
+    </div>
+
+    <!-- Right: Action Buttons -->
+    <div class="actions-section">
+      <div class="actions">
+        <button class="action-btn use" data-action="grab">GRAB<br>G</button>
+        <button class="action-btn" data-action="use">USE<br>H</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status">
+      <div class="status-dot"></div>
+      <span>Connected to Ninja Frogs</span>
+    </div>
+  </div>
+
+  <!-- Fullscreen Button -->
+  <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
+
+  <script>
+    // Orientation Detection
+    const rotateWarning = document.getElementById('rotate-warning');
+    const controller = document.getElementById('controller');
+
+    function checkOrientation() {
+      if (window.innerHeight > window.innerWidth) {
+        // Portrait mode
+        rotateWarning.classList.add('show');
+        controller.classList.remove('show');
+      } else {
+        // Landscape mode
+        rotateWarning.classList.remove('show');
+        controller.classList.add('show');
+      }
+    }
+
+    // Check on load and on orientation change
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    // Dynamic WebSocket URL for both local and production
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}`;
+    const socket = new WebSocket(wsUrl);
+    
+    socket.onopen = () => {
+      console.log("Connected to server as frogs controller");
+      socket.send("register:controller:frogs");
+    };
+    
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+    
+    socket.onclose = () => {
+      console.log("Disconnected from server");
+    };
+
+    function send(action) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("frogs:" + action);
+      }
+    }
+
+    // Handle all buttons
+    document.querySelectorAll("button[data-action]").forEach(btn => {
+      const action = btn.dataset.action;
+      if (!action || action === "center") return;
+
+      // Desktop
+      btn.addEventListener("mousedown", () => send(action + "_down"));
+      btn.addEventListener("mouseup", () => send(action + "_up"));
+      btn.addEventListener("mouseleave", () => send(action + "_up"));
+
+      // Mobile
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        send(action + "_down");
+      }, { passive: false });
+
+      btn.addEventListener("touchend", e => {
+        e.preventDefault();
+        send(action + "_up");
+      }, { passive: false });
+
+      btn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        send(action + "_up");
+      }, { passive: false });
+    });
+
+    // Prevent default touch behaviors
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+
+    // Fullscreen functionality
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Error attempting to enable fullscreen:', err);
+        });
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    // Update button icon based on fullscreen state
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fullscreenBtn.textContent = '⛶'; // Exit fullscreen icon
+      } else {
+        fullscreenBtn.textContent = '⛶'; // Enter fullscreen icon
+      }
+    });
+  </script>
+</body>
+</html>
+

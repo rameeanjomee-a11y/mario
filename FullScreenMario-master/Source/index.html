@@ -153,8 +153,8 @@
       const socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log("Connected to server as game client");
-        socket.send("register:game");
+        console.log("Connected to server as mario game client");
+        socket.send("register:game:mario");
       };
       
       socket.onerror = (error) => {

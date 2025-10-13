@@ -13,8 +13,11 @@ RUN npm ci --only=production
 # Copy application files
 COPY server.js ./
 COPY controller.html ./
+COPY controller2.html ./
+COPY controller3.html ./
 COPY liara.json ./
 COPY FullScreenMario-master ./FullScreenMario-master
+COPY games ./games
 
 # Set environment variable for production
 ENV NODE_ENV=production
