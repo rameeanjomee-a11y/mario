@@ -5,9 +5,14 @@
 All necessary files are now configured for deployment:
 
 ### Updated Files
-- ✅ `Dockerfile` - Updated to include all game files
+- ✅ `Dockerfile` - Updated to include all game files and documentation
 - ✅ `package.json` - Updated version to 2.0.0
-- ✅ `server.js` - Multi-game support with WebSocket rooms
+- ✅ `server.js` - Multi-session support with session ID-based rooms
+- ✅ `controller.html` - Mario controller with session ID support
+- ✅ `controller2.html` - Frogs P1 controller with session ID support
+- ✅ `controller3.html` - Frogs P2 controller with session ID support
+- ✅ `FullScreenMario-master/Source/index.html` - Mario game with session ID support
+- ✅ `games/frogs/ninja_frog_wars.html` - Frogs game with session ID support
 - ✅ `deploy.sh` - Updated deployment script
 - ✅ `.dockerignore` - Already properly configured
 
@@ -16,6 +21,7 @@ All necessary files are now configured for deployment:
 - ✅ `controller3.html` - Ninja Frogs Player 2 controller (Purple)
 - ✅ `games/frogs/` - Ninja Frogs game files
 - ✅ `MULTI_GAME_SETUP.md` - Documentation
+- ✅ `MULTIPLAYER_SESSIONS.md` - Multi-session parallel playing documentation
 - ✅ `DEPLOYMENT.md` - This file
 
 ## 🚀 Deployment Steps
@@ -41,12 +47,13 @@ git push origin main
 ## 📋 What Gets Deployed
 
 The Dockerfile will copy:
-- `server.js` - Main server file
-- `controller.html` - Mario controller
-- `controller2.html` - Ninja Frogs P1 controller
-- `controller3.html` - Ninja Frogs P2 controller
-- `FullScreenMario-master/` - Mario game files
-- `games/` - All additional games (Ninja Frogs)
+- `server.js` - Main server file with multi-session support
+- `controller.html` - Mario controller with session ID support
+- `controller2.html` - Ninja Frogs P1 controller with session ID support
+- `controller3.html` - Ninja Frogs P2 controller with session ID support
+- `FullScreenMario-master/` - Mario game files with session ID support
+- `games/` - All additional games (Ninja Frogs) with session ID support
+- `MULTIPLAYER_SESSIONS.md` - Multi-session feature documentation
 - `package.json` & `package-lock.json` - Dependencies
 
 ## 🌐 Platform-Specific Notes
@@ -70,14 +77,30 @@ docker-compose up -d
 
 After deployment, test these URLs (replace with your domain):
 
-### Mario Game
+### Mario Game (Legacy - Default Session)
 - Controller: `https://your-domain.com/controller`
 - Game: `https://your-domain.com/mario`
 
-### Ninja Frogs Game
+### Mario Game (Multi-Session Mode)
+- Session 1 Game: `https://your-domain.com/mario?id=123`
+- Session 1 Controller: `https://your-domain.com/controller?id=123`
+- Session 2 Game: `https://your-domain.com/mario?id=124`
+- Session 2 Controller: `https://your-domain.com/controller?id=124`
+
+### Ninja Frogs Game (Legacy - Default Session)
 - Controller P1 (Green): `https://your-domain.com/controller2`
 - Controller P2 (Purple): `https://your-domain.com/controller3`
 - Game: `https://your-domain.com/frogs`
+
+### Ninja Frogs Game (Multi-Session Mode)
+- Session 1 Game: `https://your-domain.com/frogs?id=abc`
+- Session 1 Controller P1: `https://your-domain.com/controller2?id=abc`
+- Session 1 Controller P2: `https://your-domain.com/controller3?id=abc`
+- Session 2 Game: `https://your-domain.com/frogs?id=xyz`
+- Session 2 Controller P1: `https://your-domain.com/controller2?id=xyz`
+- Session 2 Controller P2: `https://your-domain.com/controller3?id=xyz`
+
+**See `MULTIPLAYER_SESSIONS.md` for complete documentation on the multi-session feature!**
 
 ## ⚠️ Important Notes
 
@@ -85,6 +108,9 @@ After deployment, test these URLs (replace with your domain):
 2. **HTTPS**: Controllers work better with HTTPS (especially on mobile)
 3. **Port**: The app uses port 3000 by default (configurable via PORT env variable)
 4. **File Size**: Ninja Frogs game is ~64MB, ensure your platform supports larger deployments
+5. **Multi-Session Feature**: Multiple users can now play simultaneously using unique session IDs (e.g., `?id=123`)
+6. **Session Isolation**: Each session ID creates an isolated room - controls from one session won't affect another
+7. **Backward Compatibility**: URLs without session IDs still work (use "default" session)
 
 ## 🐛 Troubleshooting
 
@@ -103,6 +129,12 @@ After deployment, test these URLs (replace with your domain):
 2. Verify the game canvas has focus
 3. Test with keyboard first (Arrow keys + Ctrl/Shift)
 
+### If multi-session doesn't work (controls affect wrong game):
+1. Verify both game and controller use the **same session ID**
+2. Check browser console for session ID logs (should show on connection)
+3. Check server console for room creation logs (e.g., "Created new room: mario:123")
+4. Try using a different, unique session ID to test isolation
+
 ## 📝 Environment Variables
 
 Optional environment variables:
@@ -117,8 +149,11 @@ Optional environment variables:
 ✅ WebSocket connections establish successfully
 ✅ Controllers can control their respective games
 ✅ Both players can play Ninja Frogs simultaneously
+✅ Multi-session feature works (different session IDs don't interfere)
+✅ Session isolation is maintained (controls only affect their own session)
+✅ Backward compatibility works (URLs without session IDs use "default" session)
 
 ---
 
-**Ready to deploy!** All files are configured and the platform will work on any hosting service that supports Node.js and WebSockets.
+**Ready to deploy!** All files are configured and the platform will work on any hosting service that supports Node.js and WebSockets. The new multi-session feature allows unlimited simultaneous games using unique session IDs!
 

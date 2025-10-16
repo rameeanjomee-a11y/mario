@@ -16,6 +16,7 @@ COPY controller.html ./
 COPY controller2.html ./
 COPY controller3.html ./
 COPY liara.json ./
+COPY MULTIPLAYER_SESSIONS.md ./
 COPY FullScreenMario-master ./FullScreenMario-master
 COPY games ./games
 
