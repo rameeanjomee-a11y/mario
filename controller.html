@@ -342,6 +342,12 @@
   <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
 
   <script>
+    // Get session ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id') || 'default';
+    
+    console.log(`Mario Controller - Session ID: ${sessionId}`);
+
     // Orientation Detection
     const rotateWarning = document.getElementById('rotate-warning');
     const controller = document.getElementById('controller');
@@ -369,8 +375,8 @@
     const socket = new WebSocket(wsUrl);
     
     socket.onopen = () => {
-      console.log("Connected to server as mario controller");
-      socket.send("register:controller:mario");
+      console.log(`Connected to server as mario controller (Session: ${sessionId})`);
+      socket.send(`register:controller:mario:${sessionId}`);
     };
     
     socket.onerror = (error) => {
@@ -383,7 +389,7 @@
 
     function send(action) {
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send("mario:" + action);
+        socket.send(`mario:${sessionId}:${action}`);
       }
     }
 

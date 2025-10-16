@@ -251,14 +251,20 @@
 
 	<!-- 🐸 Remote Controller Bridge for Ninja Frogs -->
 	<script>
+		// Get session ID from URL parameter
+		const urlParams = new URLSearchParams(window.location.search);
+		const sessionId = urlParams.get('id') || 'default';
+		
+		console.log(`Frogs Game - Session ID: ${sessionId}`);
+
 		// Dynamic WebSocket URL for both local and production
 		const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 		const wsUrl = `${protocol}//${window.location.host}`;
 		const socket = new WebSocket(wsUrl);
 
 		socket.onopen = () => {
-			console.log("Connected to server as frogs game client");
-			socket.send("register:game:frogs");
+			console.log(`Connected to server as frogs game client (Session: ${sessionId})`);
+			socket.send(`register:game:frogs:${sessionId}`);
 		};
 		
 		socket.onerror = (error) => {

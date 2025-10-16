@@ -319,6 +319,12 @@
   <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
 
   <script>
+    // Get session ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id') || 'default';
+    
+    console.log(`Frogs Controller P1 - Session ID: ${sessionId}`);
+
     // Orientation Detection
     const rotateWarning = document.getElementById('rotate-warning');
     const controller = document.getElementById('controller');
@@ -346,8 +352,8 @@
     const socket = new WebSocket(wsUrl);
     
     socket.onopen = () => {
-      console.log("Connected to server as frogs controller");
-      socket.send("register:controller:frogs");
+      console.log(`Connected to server as frogs controller (Session: ${sessionId})`);
+      socket.send(`register:controller:frogs:${sessionId}`);
     };
     
     socket.onerror = (error) => {
@@ -360,7 +366,7 @@
 
     function send(action) {
       if (socket.readyState === WebSocket.OPEN) {
-        socket.send("frogs:" + action);
+        socket.send(`frogs:${sessionId}:${action}`);
       }
     }
 
