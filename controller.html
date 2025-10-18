@@ -86,19 +86,17 @@
     }
 
     .dpad {
-      display: grid;
-      grid-template-areas:
-        ". up ."
-        "left center right"
-        ". down .";
-      gap: 3px;
-      background: transparent;
-      padding: 5px;
+      position: relative;
+      width: 330px;
+      height: 330px;
+      background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
 
     .dpad-btn {
-      width: 70px;
-      height: 70px;
+      position: absolute;
       background: linear-gradient(145deg, #3a3a3a, #1a1a1a);
       color: #fff;
       border: none;
@@ -107,25 +105,53 @@
       align-items: center;
       user-select: none;
       touch-action: none;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      transition: all 0.1s ease;
+      cursor: pointer;
     }
 
     .dpad-btn:active {
       background: linear-gradient(145deg, #1a1a1a, #3a3a3a);
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
-      transform: translateY(2px);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+      filter: brightness(0.8);
     }
 
-    .dpad-btn[data-action="up"] { grid-area: up; border-radius: 8px; }
-    .dpad-btn[data-action="down"] { grid-area: down; border-radius: 8px; }
-    .dpad-btn[data-action="left"] { grid-area: left; border-radius: 8px; }
-    .dpad-btn[data-action="right"] { grid-area: right; border-radius: 8px; }
-    .dpad-btn[data-action="center"] { 
-      grid-area: center; 
-      background: transparent;
-      box-shadow: none;
+    /* Triangle shapes using clip-path */
+    .dpad-btn[data-action="up"] {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      padding-bottom: 80px;
+    }
+
+    .dpad-btn[data-action="down"] {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 100%, 100% 100%, 50% 0);
+      padding-top: 80px;
+    }
+
+    .dpad-btn[data-action="left"] {
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(0 0, 0 100%, 100% 50%);
+      padding-right: 80px;
+    }
+
+    .dpad-btn[data-action="right"] {
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(100% 0, 100% 100%, 0 50%);
+      padding-left: 80px;
     }
 
     /* Center Section (Select/Start) */
@@ -302,15 +328,10 @@
     <!-- Left: D-Pad -->
     <div class="dpad-section">
       <div class="dpad">
-        <div class="dpad-btn" data-action="center"></div>
         <button class="dpad-btn" data-action="up">▲</button>
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="left">◀</button>
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="right">▶</button>
-        <div class="dpad-btn" data-action="center"></div>
         <button class="dpad-btn" data-action="down">▼</button>
-        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="left">◀</button>
+        <button class="dpad-btn" data-action="right">▶</button>
       </div>
     </div>
 

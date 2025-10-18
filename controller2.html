@@ -86,19 +86,17 @@
     }
 
     .dpad {
-      display: grid;
-      grid-template-areas:
-        ". up ."
-        "left center right"
-        ". down .";
-      gap: 3px;
-      background: transparent;
-      padding: 5px;
+      position: relative;
+      width: 330px;
+      height: 330px;
+      background: linear-gradient(145deg, #27ae60, #1e8449);
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
 
     .dpad-btn {
-      width: 70px;
-      height: 70px;
+      position: absolute;
       background: linear-gradient(145deg, #1e8449, #145a32);
       color: #fff;
       border: none;
@@ -107,25 +105,53 @@
       align-items: center;
       user-select: none;
       touch-action: none;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      transition: all 0.1s ease;
+      cursor: pointer;
     }
 
     .dpad-btn:active {
       background: linear-gradient(145deg, #145a32, #1e8449);
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
-      transform: translateY(2px);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+      filter: brightness(0.8);
     }
 
-    .dpad-btn[data-action="up"] { grid-area: up; border-radius: 8px; }
-    .dpad-btn[data-action="down"] { grid-area: down; border-radius: 8px; }
-    .dpad-btn[data-action="left"] { grid-area: left; border-radius: 8px; }
-    .dpad-btn[data-action="right"] { grid-area: right; border-radius: 8px; }
-    .dpad-btn[data-action="center"] { 
-      grid-area: center; 
-      background: transparent;
-      box-shadow: none;
+    /* Triangle shapes using clip-path */
+    .dpad-btn[data-action="up"] {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      padding-bottom: 80px;
+    }
+
+    .dpad-btn[data-action="down"] {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 100%, 100% 100%, 50% 0);
+      padding-top: 80px;
+    }
+
+    .dpad-btn[data-action="left"] {
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(0 0, 0 100%, 100% 50%);
+      padding-right: 80px;
+    }
+
+    .dpad-btn[data-action="right"] {
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(100% 0, 100% 100%, 0 50%);
+      padding-left: 80px;
     }
 
     /* Center Section (Game Title) */
@@ -167,46 +193,77 @@
     }
 
     .actions {
-      display: flex;
-      gap: 30px;
-      align-items: center;
       position: relative;
+      width: 330px;
+      height: 330px;
+      background: linear-gradient(145deg, #27ae60, #1e8449);
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
 
     .action-btn {
-      width: 90px;
-      height: 90px;
-      background: linear-gradient(145deg, #f39c12, #d68910);
+      position: absolute;
       color: #fff;
       border: none;
-      border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
-      font-weight: bold;
       user-select: none;
       touch-action: none;
-      box-shadow: 
-        0 6px 12px rgba(0,0,0,0.4),
-        inset 0 -2px 6px rgba(0,0,0,0.3),
-        inset 0 2px 6px rgba(255,255,255,0.2);
+      font-size: 24px;
+      font-weight: bold;
+      transition: all 0.1s ease;
+      cursor: pointer;
+      line-height: 1.3;
     }
 
     .action-btn:active {
-      background: linear-gradient(145deg, #d68910, #f39c12);
-      box-shadow: 
-        0 3px 6px rgba(0,0,0,0.4),
-        inset 0 3px 10px rgba(0,0,0,0.5);
-      transform: translateY(3px);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+      filter: brightness(0.8);
+    }
+
+    /* Triangle shapes for action buttons */
+    .action-btn.jump {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      background: linear-gradient(145deg, #3498db, #2980b9);
+      padding-bottom: 80px;
+    }
+
+    .action-btn.jump:active {
+      background: linear-gradient(145deg, #2980b9, #3498db);
     }
 
     .action-btn.use {
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(0 0, 0 100%, 100% 50%);
       background: linear-gradient(145deg, #e74c3c, #c0392b);
+      padding-right: 80px;
     }
 
     .action-btn.use:active {
       background: linear-gradient(145deg, #c0392b, #e74c3c);
+    }
+
+    .action-btn.grab {
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(100% 0, 100% 100%, 0 50%);
+      background: linear-gradient(145deg, #f39c12, #d68910);
+      padding-left: 80px;
+    }
+
+    .action-btn.grab:active {
+      background: linear-gradient(145deg, #d68910, #f39c12);
     }
 
     /* Connection Status */
@@ -282,15 +339,9 @@
     <!-- Left: Movement Controls -->
     <div class="dpad-section">
       <div class="dpad">
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="up">W ▲</button>
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="left">A ◀</button>
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="right">D ▶</button>
-        <div class="dpad-btn" data-action="center"></div>
-        <button class="dpad-btn" data-action="down">S ▼</button>
-        <div class="dpad-btn" data-action="center"></div>
+        <button class="dpad-btn" data-action="down">S<br>▼</button>
+        <button class="dpad-btn" data-action="left">A<br>◀</button>
+        <button class="dpad-btn" data-action="right">D<br>▶</button>
       </div>
     </div>
 
@@ -303,8 +354,9 @@
     <!-- Right: Action Buttons -->
     <div class="actions-section">
       <div class="actions">
-        <button class="action-btn use" data-action="grab">GRAB<br>G</button>
-        <button class="action-btn" data-action="use">USE<br>H</button>
+        <button class="action-btn jump" data-action="up">JUMP<br>W</button>
+        <button class="action-btn grab" data-action="grab">GRAB<br>G</button>
+        <button class="action-btn use" data-action="use">USE<br>H</button>
       </div>
     </div>
 
