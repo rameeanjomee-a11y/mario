@@ -115,6 +115,20 @@
       background: linear-gradient(145deg, #512e5f, #6c3483);
       box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
       filter: brightness(0.8);
+      transform: scale(0.95);
+    }
+    
+    .dpad-btn.pressed {
+      background: linear-gradient(145deg, #3d2249, #512e5f) !important;
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.8) !important;
+      transform: scale(0.92) !important;
+      animation: pulse 0.2s ease-out;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(0.88); }
+      100% { transform: scale(0.92); }
     }
 
     /* Triangle shapes using clip-path */
@@ -159,9 +173,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 15px;
       grid-column: 2;
       grid-row: 1;
+      position: relative;
+    }
+
+    .fullscreen-center {
+      margin-bottom: 5px;
     }
 
     .logo {
@@ -183,11 +202,12 @@
       50% { transform: translateY(-10px); }
     }
 
-    .player-badge {
-      font-size: 24px;
-      font-weight: bold;
-      color: #f39c12;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    .status-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
     }
 
     /* Action Buttons Section (Right) */
@@ -228,6 +248,14 @@
     .action-btn:active {
       box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
       filter: brightness(0.8);
+      transform: scale(0.95);
+    }
+    
+    .action-btn.pressed {
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.8) !important;
+      filter: brightness(0.6) !important;
+      transform: scale(0.92) !important;
+      animation: pulse 0.2s ease-out;
     }
 
     /* Triangle shapes for action buttons */
@@ -273,60 +301,67 @@
       background: linear-gradient(145deg, #d68910, #f39c12);
     }
 
-    /* Connection Status */
+    /* Connection Status - moved to center */
     .status {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      text-align: center;
-      color: rgba(255,255,255,0.9);
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      display: none;
     }
 
     .status-dot {
-      width: 12px;
-      height: 12px;
-      background: #e67e22;
+      width: 10px;
+      height: 10px;
+      background: #95a5a6;
       border-radius: 50%;
-      box-shadow: 0 0 10px #e67e22;
-      animation: pulse 2s infinite;
+      box-shadow: 0 0 8px rgba(149, 165, 166, 0.5);
+      animation: pulse-slow 2s infinite;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    .status-dot.connected {
+      background: #2ecc71;
+      box-shadow: 0 0 12px #2ecc71;
+      animation: pulse-connected 2s infinite;
     }
 
-    /* Fullscreen Button */
+    .status-dot.disconnected {
+      background: #e74c3c;
+      box-shadow: 0 0 8px #e74c3c;
+      animation: none;
+    }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes pulse-connected {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    /* Fullscreen Button - centered above title */
     .fullscreen-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
       color: white;
-      font-size: 24px;
+      font-size: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
       user-select: none;
       touch-action: none;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      transition: all 0.2s ease;
     }
 
     .fullscreen-btn:hover {
-      background: rgba(0, 0, 0, 0.8);
-      border-color: rgba(255, 255, 255, 0.5);
-      transform: scale(1.1);
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
     }
 
     .fullscreen-btn:active {
@@ -355,9 +390,13 @@
 
     <!-- Center: Logo -->
     <div class="center-section">
+      <button class="fullscreen-btn fullscreen-center" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
       <div class="frog-emoji">🐸</div>
       <div class="logo">NINJA FROGS</div>
-      <div class="player-badge">PLAYER 2</div>
+      <div class="status-center">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Connecting...</span>
+      </div>
     </div>
 
     <!-- Right: Action Buttons -->
@@ -369,15 +408,7 @@
       </div>
     </div>
 
-    <!-- Status -->
-    <div class="status">
-      <div class="status-dot"></div>
-      <span>Player 2 Connected</span>
-    </div>
   </div>
-
-  <!-- Fullscreen Button -->
-  <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
 
   <script>
     // Get session ID from URL parameter
@@ -385,6 +416,10 @@
     const sessionId = urlParams.get('id') || 'default';
     
     console.log(`Frogs Controller P2 - Session ID: ${sessionId}`);
+
+    // Get status elements
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
 
     // Orientation Detection
     const rotateWarning = document.getElementById('rotate-warning');
@@ -415,14 +450,26 @@
     socket.onopen = () => {
       console.log(`Connected to server as frogs controller P2 (Session: ${sessionId})`);
       socket.send(`register:controller:frogs:${sessionId}`);
+      
+      // Update status to connected
+      statusDot.className = 'status-dot connected';
+      statusText.textContent = 'Connected';
     };
     
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
+      
+      // Update status to disconnected
+      statusDot.className = 'status-dot disconnected';
+      statusText.textContent = 'Connection Error';
     };
     
     socket.onclose = () => {
       console.log("Disconnected from server");
+      
+      // Update status to disconnected
+      statusDot.className = 'status-dot disconnected';
+      statusText.textContent = 'Disconnected';
     };
 
     function send(action) {
@@ -447,26 +494,36 @@
 
       // Desktop
       btn.addEventListener("mousedown", () => {
+        btn.classList.add('pressed');
         hapticFeedback(action);
         send(action + "_down");
       });
-      btn.addEventListener("mouseup", () => send(action + "_up"));
-      btn.addEventListener("mouseleave", () => send(action + "_up"));
+      btn.addEventListener("mouseup", () => {
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      });
 
       // Mobile
       btn.addEventListener("touchstart", e => {
         e.preventDefault();
+        btn.classList.add('pressed');
         hapticFeedback(action);
         send(action + "_down");
       }, { passive: false });
 
       btn.addEventListener("touchend", e => {
         e.preventDefault();
+        btn.classList.remove('pressed');
         send(action + "_up");
       }, { passive: false });
 
       btn.addEventListener("touchcancel", e => {
         e.preventDefault();
+        btn.classList.remove('pressed');
         send(action + "_up");
       }, { passive: false });
     });
@@ -496,7 +553,7 @@
     // Update button icon based on fullscreen state
     document.addEventListener('fullscreenchange', () => {
       if (document.fullscreenElement) {
-        fullscreenBtn.textContent = '⛶'; // Exit fullscreen icon
+        fullscreenBtn.textContent = '❐'; // Exit fullscreen icon (maximized)
       } else {
         fullscreenBtn.textContent = '⛶'; // Enter fullscreen icon
       }
