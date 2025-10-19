@@ -339,10 +339,10 @@
     <!-- Left: Movement Controls -->
     <div class="dpad-section">
       <div class="dpad">
-        <button class="dpad-btn" data-action="up">W<br>▲</button>
-        <button class="dpad-btn" data-action="down">S<br>▼</button>
-        <button class="dpad-btn" data-action="left">A<br>◀</button>
-        <button class="dpad-btn" data-action="right">D<br>▶</button>
+        <button class="dpad-btn" data-action="up">▲</button>
+        <button class="dpad-btn" data-action="down">▼</button>
+        <button class="dpad-btn" data-action="left">◀</button>
+        <button class="dpad-btn" data-action="right">▶</button>
       </div>
     </div>
 
@@ -355,9 +355,9 @@
     <!-- Right: Action Buttons -->
     <div class="actions-section">
       <div class="actions">
-        <button class="action-btn jump" data-action="up">JUMP<br>W</button>
-        <button class="action-btn grab" data-action="grab">GRAB<br>G</button>
-        <button class="action-btn use" data-action="use">USE<br>H</button>
+        <button class="action-btn jump" data-action="up">JUMP</button>
+        <button class="action-btn grab" data-action="grab">GRAB</button>
+        <button class="action-btn use" data-action="use">USE</button>
       </div>
     </div>
 
@@ -423,19 +423,32 @@
       }
     }
 
+    // Haptic feedback function
+    function hapticFeedback(action) {
+      if (navigator.vibrate) {
+        // Longer vibration for USE button (100ms), shorter for others (50ms)
+        const duration = action === "use" ? 100 : 50;
+        navigator.vibrate(duration);
+      }
+    }
+
     // Handle all buttons
     document.querySelectorAll("button[data-action]").forEach(btn => {
       const action = btn.dataset.action;
       if (!action || action === "center") return;
 
       // Desktop
-      btn.addEventListener("mousedown", () => send(action + "_down"));
+      btn.addEventListener("mousedown", () => {
+        hapticFeedback(action);
+        send(action + "_down");
+      });
       btn.addEventListener("mouseup", () => send(action + "_up"));
       btn.addEventListener("mouseleave", () => send(action + "_up"));
 
       // Mobile
       btn.addEventListener("touchstart", e => {
         e.preventDefault();
+        hapticFeedback(action);
         send(action + "_down");
       }, { passive: false });
 
