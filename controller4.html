@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ninja Frogs P2 Controller</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* Rotation Warning */
+    #rotate-warning {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    #rotate-warning.show {
+      display: flex;
+    }
+
+    .rotate-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: rotate 2s infinite;
+    }
+
+    @keyframes rotate {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+
+    .rotate-text {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Ninja Frogs Controller */
+    .controller {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(145deg, #27ae60, #229954);
+      position: relative;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr auto;
+      gap: 0;
+    }
+
+    .controller.show {
+      display: grid;
+    }
+
+    /* Touch Control Area (Left Half) */
+    .touch-control-area {
+      grid-column: 1;
+      grid-row: 1;
+      background: linear-gradient(145deg, #1e8449, #145a32);
+      margin: 20px 10px 20px 20px;
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+      user-select: none;
+      touch-action: none;
+    }
+
+    .touch-label {
+      position: absolute;
+      top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 3px;
+    }
+
+    .touch-indicator {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+      border: 3px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .touch-indicator.active {
+      opacity: 1;
+    }
+
+    /* Action Buttons Area (Right Half) */
+    .action-buttons-area {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 15px;
+      padding: 40px 20px 40px 10px;
+    }
+
+    .action-rect-btn {
+      background: linear-gradient(145deg, #f39c12, #d68910);
+      color: #fff;
+      border: none;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      user-select: none;
+      touch-action: none;
+      box-shadow: 
+        0 6px 12px rgba(0,0,0,0.4),
+        inset 0 -2px 6px rgba(0,0,0,0.3),
+        inset 0 2px 6px rgba(255,255,255,0.2);
+    }
+
+    .action-rect-btn.full-width {
+      flex: 2.3;
+      min-height: 150px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 15px;
+      flex: 1;
+    }
+
+    .button-row .action-rect-btn {
+      min-height: 100px;
+    }
+
+    .button-row .action-rect-btn.grab {
+      flex: 1.3;
+    }
+
+    .button-row .action-rect-btn.use {
+      flex: 2;
+    }
+
+    .action-rect-btn .btn-icon {
+      font-size: 36px;
+      margin-bottom: 5px;
+    }
+
+    .action-rect-btn .btn-label {
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    .action-rect-btn:active {
+      background: linear-gradient(145deg, #d68910, #f39c12);
+      box-shadow: 
+        0 3px 6px rgba(0,0,0,0.4),
+        inset 0 3px 10px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+    }
+
+    .action-rect-btn.jump {
+      background: linear-gradient(145deg, #3498db, #2980b9);
+    }
+
+    .action-rect-btn.jump:active {
+      background: linear-gradient(145deg, #2980b9, #3498db);
+    }
+
+    .action-rect-btn.grab {
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+    }
+
+    .action-rect-btn.grab:active {
+      background: linear-gradient(145deg, #c0392b, #e74c3c);
+    }
+
+    .action-rect-btn.use {
+      background: linear-gradient(145deg, #9b59b6, #8e44ad);
+    }
+
+    .action-rect-btn.use:active {
+      background: linear-gradient(145deg, #8e44ad, #9b59b6);
+    }
+
+    /* Connection Status */
+    .status {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: #95a5a6;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(149, 165, 166, 0.8);
+      animation: pulse-slow 2s infinite;
+      flex-shrink: 0;
+    }
+
+    .status-dot.connected {
+      background: #2ecc71;
+      box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+      animation: pulse-connected 1.5s infinite;
+    }
+
+    .status-dot.disconnected {
+      background: #e74c3c;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+      animation: pulse-slow 2s infinite;
+    }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.95); }
+    }
+
+    @keyframes pulse-connected {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    /* Fullscreen Button */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.1);
+    }
+
+    .fullscreen-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Visual feedback for button press */
+    .btn-feedback {
+      animation: buttonPress 0.15s ease-out;
+    }
+
+    @keyframes buttonPress {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.95); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .action-rect-btn.pressed {
+      transform: scale(0.92);
+      box-shadow: 
+        0 2px 5px rgba(0,0,0,0.5),
+        inset 0 4px 12px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Rotation Warning -->
+  <div id="rotate-warning">
+    <div class="rotate-icon">📱</div>
+    <div class="rotate-text">Please rotate your device to landscape mode</div>
+  </div>
+
+  <!-- Ninja Frogs Controller -->
+  <div class="controller" id="controller">
+    <!-- Left Half: Touch Control Area -->
+    <div class="touch-control-area">
+      <div class="touch-indicator" id="touch-indicator"></div>
+      <div class="touch-label">MOVE</div>
+    </div>
+
+    <!-- Right Half: Action Buttons -->
+    <div class="action-buttons-area">
+      <!-- Top Row: Jump Button (Full Width) -->
+      <button class="action-rect-btn jump full-width" data-action="arrow_up">
+        <span class="btn-icon">⬆</span>
+        <span class="btn-label">JUMP</span>
+      </button>
+      
+      <!-- Bottom Row: Grab and Use (Side by Side) -->
+      <div class="button-row">
+        <button class="action-rect-btn grab" data-action="ctrl">
+          <span class="btn-icon">🤏</span>
+          <span class="btn-label">GRAB</span>
+        </button>
+        <button class="action-rect-btn use" data-action="shift">
+          <span class="btn-icon">✨</span>
+          <span class="btn-label">USE</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Connecting to Ninja Frogs P2...</span>
+    </div>
+  </div>
+
+
+  <!-- Fullscreen Button -->
+  <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
+
+  <script>
+    // Orientation Detection
+    const rotateWarning = document.getElementById('rotate-warning');
+    const controller = document.getElementById('controller');
+
+    function checkOrientation() {
+      if (window.innerHeight > window.innerWidth) {
+        // Portrait mode
+        rotateWarning.classList.add('show');
+        controller.classList.remove('show');
+      } else {
+        // Landscape mode
+        rotateWarning.classList.remove('show');
+        controller.classList.add('show');
+      }
+    }
+
+    // Check on load and on orientation change
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    // Get session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id') || 'default';
+    console.log('Session ID:', sessionId);
+
+    // Dynamic WebSocket URL for both local and production
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}`;
+    const socket = new WebSocket(wsUrl);
+    
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    
+    socket.onopen = () => {
+      console.log("Connected to server as frogs P2 controller");
+      socket.send(`register:controller:frogs:${sessionId}`);
+      statusDot.classList.remove('disconnected');
+      statusDot.classList.add('connected');
+      statusText.textContent = 'Connected to Ninja Frogs P2';
+    };
+    
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      statusDot.classList.remove('connected');
+      statusDot.classList.add('disconnected');
+      statusText.textContent = 'Connection Error';
+    };
+    
+    socket.onclose = () => {
+      console.log("Disconnected from server");
+      statusDot.classList.remove('connected');
+      statusDot.classList.add('disconnected');
+      statusText.textContent = 'Disconnected';
+    };
+
+    // Vibration API diagnostic check
+    console.log('=== Vibration Support Check ===');
+    console.log('navigator.vibrate exists:', 'vibrate' in navigator);
+    console.log('navigator.vibrate function:', typeof navigator.vibrate);
+    console.log('Protocol:', window.location.protocol);
+    console.log('User Agent:', navigator.userAgent);
+
+    // Initialize vibration on first user interaction (required by some browsers)
+    let vibrationEnabled = false;
+    function enableVibration() {
+      if (!vibrationEnabled && navigator.vibrate) {
+        navigator.vibrate(1); // Test vibration
+        vibrationEnabled = true;
+        console.log('Vibration enabled!');
+      }
+    }
+
+    function send(action) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(`frogs:${sessionId}:${action}`);
+      }
+    }
+
+    // Haptic Feedback (Vibration) Function
+    function vibrate(pattern = 50, button = null) {
+      console.log('🔔 vibrate() called with pattern:', pattern);
+      
+      // Enable vibration on first interaction
+      enableVibration();
+      
+      // Try vibration API
+      if (navigator.vibrate) {
+        try {
+          const vibrated = navigator.vibrate(pattern);
+          console.log('✅ Vibration API called:', pattern + 'ms', 'Return value:', vibrated);
+        } catch (err) {
+          console.error('❌ Vibration error:', err);
+        }
+      }
+      
+      // Visual feedback (works on all devices)
+      if (button) {
+        button.classList.add('btn-feedback');
+        button.classList.add('pressed');
+        setTimeout(() => {
+          button.classList.remove('btn-feedback');
+          button.classList.remove('pressed');
+        }, 150);
+      }
+      
+      // iOS haptic feedback alternative: use Web Audio API for tactile sensation
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          const audioContext = new AudioContext();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.value = 50; // Low frequency for "thud" feel
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.02);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.02);
+        }
+      } catch (err) {
+        // Silent fail - audio feedback is optional
+      }
+    }
+
+    // Touch Control Variables
+    let touchStartX = null;
+    let touchLastX = null;
+    let isMovingLeft = false;
+    let isMovingRight = false;
+    const touchArea = document.querySelector('.touch-control-area');
+    const touchIndicator = document.getElementById('touch-indicator');
+
+    // Touch Control Handler (Relative Movement)
+    touchArea.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = touchArea.getBoundingClientRect();
+      
+      touchStartX = touch.clientX - rect.left;
+      touchLastX = touchStartX;
+      
+      // Show indicator
+      touchIndicator.style.left = touchStartX - 40 + 'px';
+      touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
+      touchIndicator.classList.add('active');
+      
+      console.log('Touch started at:', touchStartX);
+    }, { passive: false });
+
+    touchArea.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (touchLastX === null) return;
+      
+      const touch = e.touches[0];
+      const rect = touchArea.getBoundingClientRect();
+      const currentX = touch.clientX - rect.left;
+      const deltaX = currentX - touchLastX;
+      
+      // Update indicator position
+      touchIndicator.style.left = currentX - 40 + 'px';
+      touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
+      
+      const threshold = 10; // Movement threshold
+      
+      // Moving left (swiping left from last position)
+      if (deltaX < -threshold) {
+        if (!isMovingLeft) {
+          if (isMovingRight) {
+            send('arrow_right_up');
+            isMovingRight = false;
+          }
+          send('arrow_left_down');
+          vibrate(30);
+          isMovingLeft = true;
+          console.log('Moving LEFT');
+        }
+        touchLastX = currentX; // Update reference
+      }
+      // Moving right (swiping right from last position)
+      else if (deltaX > threshold) {
+        if (!isMovingRight) {
+          if (isMovingLeft) {
+            send('arrow_left_up');
+            isMovingLeft = false;
+          }
+          send('arrow_right_down');
+          vibrate(30);
+          isMovingRight = true;
+          console.log('Moving RIGHT');
+        }
+        touchLastX = currentX; // Update reference
+      }
+    }, { passive: false });
+
+    touchArea.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      
+      // Release all movements
+      if (isMovingLeft) {
+        send('arrow_left_up');
+        isMovingLeft = false;
+      }
+      if (isMovingRight) {
+        send('arrow_right_up');
+        isMovingRight = false;
+      }
+      
+      touchStartX = null;
+      touchLastX = null;
+      touchIndicator.classList.remove('active');
+      
+      console.log('Touch ended');
+    }, { passive: false });
+
+    touchArea.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      if (isMovingLeft) send('arrow_left_up');
+      if (isMovingRight) send('arrow_right_up');
+      isMovingLeft = false;
+      isMovingRight = false;
+      touchStartX = null;
+      touchLastX = null;
+      touchIndicator.classList.remove('active');
+    }, { passive: false });
+
+    // Action Buttons (Jump, Grab, Use)
+    document.querySelectorAll(".action-rect-btn").forEach(btn => {
+      const action = btn.dataset.action;
+      if (!action) return;
+
+      // Determine vibration pattern (longer for USE button)
+      const vibrationPattern = action === 'shift' ? 100 : 50;
+
+      console.log('🎮 Attached handlers to button:', action, 'Pattern:', vibrationPattern);
+
+      // Mobile
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        console.log('👆 TOUCHSTART on', action);
+        vibrate(vibrationPattern, btn);
+        send(action + "_down");
+      }, { passive: false });
+
+      btn.addEventListener("touchend", e => {
+        e.preventDefault();
+        send(action + "_up");
+        btn.classList.remove('pressed');
+      }, { passive: false });
+
+      btn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        send(action + "_up");
+        btn.classList.remove('pressed');
+      }, { passive: false });
+    });
+
+    // Prevent default touch behaviors
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+
+    // Fullscreen functionality
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    fullscreenBtn.addEventListener('click', () => {
+      vibrate(60, fullscreenBtn); // Longer vibration for fullscreen toggle
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Error attempting to enable fullscreen:', err);
+        });
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    // Update button icon based on fullscreen state
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fullscreenBtn.textContent = '❐'; // Exit fullscreen icon (maximized)
+      } else {
+        fullscreenBtn.textContent = '⛶'; // Enter fullscreen icon
+      }
+    });
+  </script>
+</body>
+</html>
+

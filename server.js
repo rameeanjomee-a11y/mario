@@ -25,6 +25,10 @@ app.get("/controller3", (req, res) => {
   res.sendFile(path.join(__dirname, "controller3.html"));
 });
 
+app.get("/controller4", (req, res) => {
+  res.sendFile(path.join(__dirname, "controller4.html"));
+});
+
 // Routes for games
 app.get("/mario", (req, res) => {
   res.sendFile(path.join(__dirname, "FullScreenMario-master/Source/index.html"));
@@ -200,10 +204,12 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`  Example: http://localhost:${PORT}/mario?id=123`);
   console.log(`           http://localhost:${PORT}/controller?id=123`);
   console.log(`\nNinja Frogs Game with Session IDs:`);
-  console.log(`  Controller P1: http://localhost:${PORT}/controller2?id=<SESSION_ID>`);
-  console.log(`  Controller P2: http://localhost:${PORT}/controller3?id=<SESSION_ID>`);
+  console.log(`  Controller P1 (Button): http://localhost:${PORT}/controller2?id=<SESSION_ID>`);
+  console.log(`  Controller P2 (Button): http://localhost:${PORT}/controller3?id=<SESSION_ID>`);
+  console.log(`  Controller P2 (Touch): http://localhost:${PORT}/controller4?id=<SESSION_ID>`);
   console.log(`  Game: http://localhost:${PORT}/frogs?id=<SESSION_ID>`);
   console.log(`  Example: http://localhost:${PORT}/frogs?id=124`);
   console.log(`           http://localhost:${PORT}/controller2?id=124`);
+  console.log(`           http://localhost:${PORT}/controller4?id=124`);
   console.log(`\n💡 Each session ID creates an isolated game room!`);
 });
