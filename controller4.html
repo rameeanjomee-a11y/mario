@@ -479,7 +479,8 @@
       }
     }
 
-    // Touch Control Variables
+    // Touch Control Variables with multi-touch support
+    let movementTouchId = null; // Track the specific touch ID for movement
     let touchStartX = null;
     let touchLastX = null;
     let isMovingLeft = false;
@@ -487,35 +488,53 @@
     const touchArea = document.querySelector('.touch-control-area');
     const touchIndicator = document.getElementById('touch-indicator');
 
-    // Touch Control Handler (Relative Movement)
+    // Touch Control Handler (Relative Movement) - Multi-touch aware
     touchArea.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      const touch = e.touches[0];
-      const rect = touchArea.getBoundingClientRect();
+      e.stopPropagation();
       
-      touchStartX = touch.clientX - rect.left;
-      touchLastX = touchStartX;
-      
-      // Show indicator
-      touchIndicator.style.left = touchStartX - 40 + 'px';
-      touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
-      touchIndicator.classList.add('active');
-      
-      console.log('Touch started at:', touchStartX);
+      // Only track the first touch in the movement area
+      if (movementTouchId === null && e.touches.length > 0) {
+        const touch = e.touches[0];
+        movementTouchId = touch.identifier;
+        const rect = touchArea.getBoundingClientRect();
+        
+        touchStartX = touch.clientX - rect.left;
+        touchLastX = touchStartX;
+        
+        // Show indicator
+        touchIndicator.style.left = touchStartX - 40 + 'px';
+        touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
+        touchIndicator.classList.add('active');
+        
+        console.log('Touch started at:', touchStartX, 'ID:', movementTouchId);
+      }
     }, { passive: false });
 
     touchArea.addEventListener('touchmove', (e) => {
       e.preventDefault();
-      if (touchLastX === null) return;
+      e.stopPropagation();
       
-      const touch = e.touches[0];
+      if (movementTouchId === null) return;
+      
+      // Find the touch that belongs to our movement
+      let movementTouch = null;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === movementTouchId) {
+          movementTouch = e.touches[i];
+          break;
+        }
+      }
+      
+      if (!movementTouch) return;
+      
       const rect = touchArea.getBoundingClientRect();
-      const currentX = touch.clientX - rect.left;
+      const currentX = movementTouch.clientX - rect.left;
       const deltaX = currentX - touchLastX;
       
       // Update indicator position
       touchIndicator.style.left = currentX - 40 + 'px';
-      touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
+      touchIndicator.style.top = (movementTouch.clientY - rect.top - 40) + 'px';
       
       const threshold = 10; // Movement threshold
       
@@ -551,30 +570,46 @@
 
     touchArea.addEventListener('touchend', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       
-      // Release all movements
-      if (isMovingLeft) {
-        send('arrow_left_up');
-        isMovingLeft = false;
+      // Check if our movement touch ended
+      let ourTouchEnded = true;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === movementTouchId) {
+          ourTouchEnded = false;
+          break;
+        }
       }
-      if (isMovingRight) {
-        send('arrow_right_up');
-        isMovingRight = false;
+      
+      if (ourTouchEnded && movementTouchId !== null) {
+        // Release all movements
+        if (isMovingLeft) {
+          send('arrow_left_up');
+          isMovingLeft = false;
+        }
+        if (isMovingRight) {
+          send('arrow_right_up');
+          isMovingRight = false;
+        }
+        
+        movementTouchId = null;
+        touchStartX = null;
+        touchLastX = null;
+        touchIndicator.classList.remove('active');
+        
+        console.log('Touch ended');
       }
-      
-      touchStartX = null;
-      touchLastX = null;
-      touchIndicator.classList.remove('active');
-      
-      console.log('Touch ended');
     }, { passive: false });
 
     touchArea.addEventListener('touchcancel', (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      
       if (isMovingLeft) send('arrow_left_up');
       if (isMovingRight) send('arrow_right_up');
       isMovingLeft = false;
       isMovingRight = false;
+      movementTouchId = null;
       touchStartX = null;
       touchLastX = null;
       touchIndicator.classList.remove('active');
@@ -590,9 +625,10 @@
 
       console.log('🎮 Attached handlers to button:', action, 'Pattern:', vibrationPattern);
 
-      // Mobile
+      // Mobile - with stopPropagation to prevent interference with movement
       btn.addEventListener("touchstart", e => {
         e.preventDefault();
+        e.stopPropagation();
         console.log('👆 TOUCHSTART on', action);
         vibrate(vibrationPattern, btn);
         send(action + "_down");
@@ -600,12 +636,14 @@
 
       btn.addEventListener("touchend", e => {
         e.preventDefault();
+        e.stopPropagation();
         send(action + "_up");
         btn.classList.remove('pressed');
       }, { passive: false });
 
       btn.addEventListener("touchcancel", e => {
         e.preventDefault();
+        e.stopPropagation();
         send(action + "_up");
         btn.classList.remove('pressed');
       }, { passive: false });
