@@ -479,8 +479,10 @@
       }
     }
 
-    // Touch Control Variables with multi-touch support
-    let movementTouchId = null; // Track the specific touch ID for movement
+    // ===== COMPLETELY INDEPENDENT TOUCH AREAS =====
+    
+    // Movement Area Touch Tracking
+    let movementTouchId = null;
     let touchStartX = null;
     let touchLastX = null;
     let isMovingLeft = false;
@@ -488,36 +490,43 @@
     const touchArea = document.querySelector('.touch-control-area');
     const touchIndicator = document.getElementById('touch-indicator');
 
-    // Touch Control Handler (Relative Movement) - Multi-touch aware
+    // Action Buttons Touch Tracking (separate from movement)
+    const activeButtonTouches = new Map(); // touchId -> {button, action}
+
+    // === MOVEMENT AREA HANDLERS ===
     touchArea.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      // Find a touch that's inside this area
+      const rect = touchArea.getBoundingClientRect();
       
-      // Only track the first touch in the movement area
-      if (movementTouchId === null && e.touches.length > 0) {
-        const touch = e.touches[0];
-        movementTouchId = touch.identifier;
-        const rect = touchArea.getBoundingClientRect();
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        const x = touch.clientX;
+        const y = touch.clientY;
         
-        touchStartX = touch.clientX - rect.left;
-        touchLastX = touchStartX;
-        
-        // Show indicator
-        touchIndicator.style.left = touchStartX - 40 + 'px';
-        touchIndicator.style.top = (touch.clientY - rect.top - 40) + 'px';
-        touchIndicator.classList.add('active');
-        
-        console.log('Touch started at:', touchStartX, 'ID:', movementTouchId);
+        // Check if touch is inside movement area
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+          if (movementTouchId === null) {
+            e.preventDefault();
+            movementTouchId = touch.identifier;
+            touchStartX = x - rect.left;
+            touchLastX = touchStartX;
+            
+            // Show indicator
+            touchIndicator.style.left = touchStartX - 40 + 'px';
+            touchIndicator.style.top = (y - rect.top - 40) + 'px';
+            touchIndicator.classList.add('active');
+            
+            console.log('Movement touch started, ID:', movementTouchId);
+            break;
+          }
+        }
       }
     }, { passive: false });
 
     touchArea.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
       if (movementTouchId === null) return;
       
-      // Find the touch that belongs to our movement
+      // Find our movement touch
       let movementTouch = null;
       for (let i = 0; i < e.touches.length; i++) {
         if (e.touches[i].identifier === movementTouchId) {
@@ -528,6 +537,8 @@
       
       if (!movementTouch) return;
       
+      e.preventDefault(); // Only prevent default for our tracked touch
+      
       const rect = touchArea.getBoundingClientRect();
       const currentX = movementTouch.clientX - rect.left;
       const deltaX = currentX - touchLastX;
@@ -536,9 +547,8 @@
       touchIndicator.style.left = currentX - 40 + 'px';
       touchIndicator.style.top = (movementTouch.clientY - rect.top - 40) + 'px';
       
-      const threshold = 10; // Movement threshold
+      const threshold = 10;
       
-      // Moving left (swiping left from last position)
       if (deltaX < -threshold) {
         if (!isMovingLeft) {
           if (isMovingRight) {
@@ -550,9 +560,8 @@
           isMovingLeft = true;
           console.log('Moving LEFT');
         }
-        touchLastX = currentX; // Update reference
+        touchLastX = currentX;
       }
-      // Moving right (swiping right from last position)
       else if (deltaX > threshold) {
         if (!isMovingRight) {
           if (isMovingLeft) {
@@ -564,95 +573,122 @@
           isMovingRight = true;
           console.log('Moving RIGHT');
         }
-        touchLastX = currentX; // Update reference
+        touchLastX = currentX;
       }
     }, { passive: false });
 
     touchArea.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      if (movementTouchId === null) return;
       
       // Check if our movement touch ended
-      let ourTouchEnded = true;
-      for (let i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier === movementTouchId) {
-          ourTouchEnded = false;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === movementTouchId) {
+          e.preventDefault();
+          
+          // Release all movements
+          if (isMovingLeft) {
+            send('arrow_left_up');
+            isMovingLeft = false;
+          }
+          if (isMovingRight) {
+            send('arrow_right_up');
+            isMovingRight = false;
+          }
+          
+          movementTouchId = null;
+          touchStartX = null;
+          touchLastX = null;
+          touchIndicator.classList.remove('active');
+          
+          console.log('Movement touch ended');
           break;
         }
-      }
-      
-      if (ourTouchEnded && movementTouchId !== null) {
-        // Release all movements
-        if (isMovingLeft) {
-          send('arrow_left_up');
-          isMovingLeft = false;
-        }
-        if (isMovingRight) {
-          send('arrow_right_up');
-          isMovingRight = false;
-        }
-        
-        movementTouchId = null;
-        touchStartX = null;
-        touchLastX = null;
-        touchIndicator.classList.remove('active');
-        
-        console.log('Touch ended');
       }
     }, { passive: false });
 
     touchArea.addEventListener('touchcancel', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (isMovingLeft) send('arrow_left_up');
-      if (isMovingRight) send('arrow_right_up');
-      isMovingLeft = false;
-      isMovingRight = false;
-      movementTouchId = null;
-      touchStartX = null;
-      touchLastX = null;
-      touchIndicator.classList.remove('active');
+      if (movementTouchId !== null) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === movementTouchId) {
+            e.preventDefault();
+            if (isMovingLeft) send('arrow_left_up');
+            if (isMovingRight) send('arrow_right_up');
+            isMovingLeft = false;
+            isMovingRight = false;
+            movementTouchId = null;
+            touchStartX = null;
+            touchLastX = null;
+            touchIndicator.classList.remove('active');
+            break;
+          }
+        }
+      }
     }, { passive: false });
 
-    // Action Buttons (Jump, Grab, Use)
+    // === ACTION BUTTONS HANDLERS ===
     document.querySelectorAll(".action-rect-btn").forEach(btn => {
       const action = btn.dataset.action;
       if (!action) return;
 
-      // Determine vibration pattern (longer for USE button)
       const vibrationPattern = action === 'shift' ? 100 : 50;
 
-      console.log('🎮 Attached handlers to button:', action, 'Pattern:', vibrationPattern);
-
-      // Mobile - with stopPropagation to prevent interference with movement
       btn.addEventListener("touchstart", e => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('👆 TOUCHSTART on', action);
-        vibrate(vibrationPattern, btn);
-        send(action + "_down");
+        // Track each touch on this button
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const touch = e.changedTouches[i];
+          const touchId = touch.identifier;
+          
+          if (!activeButtonTouches.has(touchId)) {
+            e.preventDefault();
+            activeButtonTouches.set(touchId, { button: btn, action: action });
+            
+            console.log('Button touch started:', action, 'ID:', touchId);
+            vibrate(vibrationPattern, btn);
+            send(action + "_down");
+            btn.classList.add('pressed');
+            break; // Only handle first new touch
+          }
+        }
       }, { passive: false });
 
       btn.addEventListener("touchend", e => {
-        e.preventDefault();
-        e.stopPropagation();
-        send(action + "_up");
-        btn.classList.remove('pressed');
+        // Check if any of our tracked touches ended
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const touch = e.changedTouches[i];
+          const touchId = touch.identifier;
+          
+          if (activeButtonTouches.has(touchId)) {
+            const touchData = activeButtonTouches.get(touchId);
+            if (touchData.button === btn) {
+              e.preventDefault();
+              console.log('Button touch ended:', action, 'ID:', touchId);
+              send(action + "_up");
+              btn.classList.remove('pressed');
+              activeButtonTouches.delete(touchId);
+              break;
+            }
+          }
+        }
       }, { passive: false });
 
       btn.addEventListener("touchcancel", e => {
-        e.preventDefault();
-        e.stopPropagation();
-        send(action + "_up");
-        btn.classList.remove('pressed');
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const touch = e.changedTouches[i];
+          const touchId = touch.identifier;
+          
+          if (activeButtonTouches.has(touchId)) {
+            const touchData = activeButtonTouches.get(touchId);
+            if (touchData.button === btn) {
+              e.preventDefault();
+              send(action + "_up");
+              btn.classList.remove('pressed');
+              activeButtonTouches.delete(touchId);
+              break;
+            }
+          }
+        }
       }, { passive: false });
     });
-
-    // Prevent default touch behaviors
-    document.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-    }, { passive: false });
 
     // Fullscreen functionality
     const fullscreenBtn = document.getElementById('fullscreen-btn');
