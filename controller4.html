@@ -117,8 +117,13 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 15px;
-      padding: 40px 20px 40px 10px;
+      gap: 0;
+      margin: 20px 20px 20px 10px;
+      padding: 0;
+      background: linear-gradient(145deg, #1e8449, #145a32);
+      border-radius: 20px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+      position: relative;
     }
 
     .action-rect-btn {
@@ -139,27 +144,11 @@
         inset 0 2px 6px rgba(255,255,255,0.2);
     }
 
-    .action-rect-btn.full-width {
-      flex: 2.3;
-      min-height: 150px;
-    }
-
-    .button-row {
-      display: flex;
-      gap: 15px;
+    .action-rect-btn.jump,
+    .action-rect-btn.use {
+      width: 100%;
       flex: 1;
-    }
-
-    .button-row .action-rect-btn {
-      min-height: 100px;
-    }
-
-    .button-row .action-rect-btn.grab {
-      flex: 1.3;
-    }
-
-    .button-row .action-rect-btn.use {
-      flex: 2;
+      min-height: 150px;
     }
 
     .action-rect-btn .btn-icon {
@@ -188,20 +177,28 @@
       background: linear-gradient(145deg, #2980b9, #3498db);
     }
 
-    .action-rect-btn.grab {
-      background: linear-gradient(145deg, #e74c3c, #c0392b);
-    }
-
-    .action-rect-btn.grab:active {
-      background: linear-gradient(145deg, #c0392b, #e74c3c);
-    }
-
     .action-rect-btn.use {
       background: linear-gradient(145deg, #9b59b6, #8e44ad);
+      align-items: flex-start;
+      padding-left: 25%;
     }
 
     .action-rect-btn.use:active {
       background: linear-gradient(145deg, #8e44ad, #9b59b6);
+    }
+
+    .action-rect-btn.grab {
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+      border-radius: 100% 0 0 0;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 50%;
+      height: 80%;
+    }
+
+    .action-rect-btn.grab:active {
+      background: linear-gradient(145deg, #c0392b, #e74c3c);
     }
 
     /* Connection Status */
@@ -319,23 +316,23 @@
 
     <!-- Right Half: Action Buttons -->
     <div class="action-buttons-area">
-      <!-- Top Row: Jump Button (Full Width) -->
-      <button class="action-rect-btn jump full-width" data-action="arrow_up">
+      <!-- Jump Button (Top) -->
+      <button class="action-rect-btn jump" data-action="arrow_up">
         <span class="btn-icon">⬆</span>
         <span class="btn-label">JUMP</span>
       </button>
       
-      <!-- Bottom Row: Grab and Use (Side by Side) -->
-      <div class="button-row">
-        <button class="action-rect-btn grab" data-action="ctrl">
-          <span class="btn-icon">🤏</span>
-          <span class="btn-label">GRAB</span>
-        </button>
-        <button class="action-rect-btn use" data-action="shift">
-          <span class="btn-icon">✨</span>
-          <span class="btn-label">USE</span>
-        </button>
-      </div>
+      <!-- Use Button (Bottom) -->
+      <button class="action-rect-btn use" data-action="shift">
+        <span class="btn-icon">✨</span>
+        <span class="btn-label">USE</span>
+      </button>
+      
+      <!-- Grab Button (Overlapping) -->
+      <button class="action-rect-btn grab" data-action="ctrl">
+        <span class="btn-icon">🤏</span>
+        <span class="btn-label">GRAB</span>
+      </button>
     </div>
 
     <!-- Status -->
