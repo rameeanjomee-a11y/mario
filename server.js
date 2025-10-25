@@ -29,6 +29,14 @@ app.get("/controller4", (req, res) => {
   res.sendFile(path.join(__dirname, "controller4.html"));
 });
 
+app.get("/controller5", (req, res) => {
+  res.sendFile(path.join(__dirname, "controller5.html"));
+});
+
+app.get("/controller6", (req, res) => {
+  res.sendFile(path.join(__dirname, "controller6.html"));
+});
+
 // Routes for games
 app.get("/mario", (req, res) => {
   res.sendFile(path.join(__dirname, "FullScreenMario-master/Source/index.html"));
@@ -207,6 +215,8 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`  Controller P1 (Button): http://localhost:${PORT}/controller2?id=<SESSION_ID>`);
   console.log(`  Controller P2 (Button): http://localhost:${PORT}/controller3?id=<SESSION_ID>`);
   console.log(`  Controller P2 (Touch): http://localhost:${PORT}/controller4?id=<SESSION_ID>`);
+  console.log(`  Controller P2 (Hybrid D-pad+Action): http://localhost:${PORT}/controller5?id=<SESSION_ID>`);
+  console.log(`  Controller P2 (Touch Smooth): http://localhost:${PORT}/controller6?id=<SESSION_ID>`);
   console.log(`  Game: http://localhost:${PORT}/frogs?id=<SESSION_ID>`);
   console.log(`  Example: http://localhost:${PORT}/frogs?id=124`);
   console.log(`           http://localhost:${PORT}/controller2?id=124`);
