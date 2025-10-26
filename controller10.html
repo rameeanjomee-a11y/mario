@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Streets of Rage 2 Controller</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* Rotation Warning */
+    #rotate-warning {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    #rotate-warning.show {
+      display: flex;
+    }
+
+    .rotate-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: rotate 2s infinite;
+    }
+
+    @keyframes rotate {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+
+    .rotate-text {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Controller */
+    .controller {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(145deg, #c0392b, #a93226);
+      position: relative;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr auto;
+      gap: 0;
+    }
+
+    .controller.show {
+      display: grid;
+    }
+
+    /* D-Pad Section (Left) */
+    .dpad-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .dpad {
+      position: relative;
+      width: 330px;
+      height: 330px;
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+
+    .dpad-btn {
+      position: absolute;
+      background: linear-gradient(145deg, #c0392b, #a93226);
+      color: #fff;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      touch-action: none;
+      font-size: 32px;
+      font-weight: bold;
+      transition: all 0.1s ease;
+      cursor: pointer;
+    }
+
+    .dpad-btn:active {
+      background: linear-gradient(145deg, #a93226, #c0392b);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+      filter: brightness(0.8);
+      transform: scale(0.95);
+    }
+    
+    .dpad-btn.pressed {
+      background: linear-gradient(145deg, #7b241c, #922b21) !important;
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.8) !important;
+      transform: scale(0.92) !important;
+      animation: pulse 0.2s ease-out;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(0.88); }
+      100% { transform: scale(0.92); }
+    }
+
+    /* Triangle shapes using clip-path */
+    .dpad-btn[data-action="arrow_up"] {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      padding-bottom: 80px;
+    }
+
+    .dpad-btn[data-action="arrow_down"] {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      clip-path: polygon(0 100%, 100% 100%, 50% 0);
+      padding-top: 80px;
+    }
+
+    .dpad-btn[data-action="arrow_left"] {
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(0 0, 0 100%, 100% 50%);
+      padding-right: 80px;
+    }
+
+    .dpad-btn[data-action="arrow_right"] {
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      clip-path: polygon(100% 0, 100% 100%, 0 50%);
+      padding-left: 80px;
+    }
+
+    /* Action Buttons Area (Right) */
+    .action-buttons-area {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+      margin: 20px 20px 20px 10px;
+      padding: 0;
+      background: linear-gradient(145deg, #c0392b, #a93226);
+      border-radius: 20px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .action-rect-btn {
+      background: linear-gradient(145deg, #f39c12, #d68910);
+      color: #fff;
+      border: none;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      user-select: none;
+      touch-action: none;
+      box-shadow: 
+        0 6px 12px rgba(0,0,0,0.4),
+        inset 0 -2px 6px rgba(0,0,0,0.3),
+        inset 0 2px 6px rgba(255,255,255,0.2);
+    }
+
+    .action-rect-btn.jump,
+    .action-rect-btn.hit {
+      width: 100%;
+      flex: 1;
+      min-height: 150px;
+    }
+
+    .action-rect-btn .btn-icon {
+      font-size: 36px;
+      margin-bottom: 5px;
+    }
+
+    .action-rect-btn .btn-label {
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    .action-rect-btn:active {
+      background: linear-gradient(145deg, #d68910, #f39c12);
+      box-shadow: 
+        0 3px 6px rgba(0,0,0,0.4),
+        inset 0 3px 10px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+    }
+
+    .action-rect-btn.jump {
+      background: linear-gradient(145deg, #f39c12, #e67e22);
+    }
+
+    .action-rect-btn.jump:active {
+      background: linear-gradient(145deg, #e67e22, #f39c12);
+    }
+
+    .action-rect-btn.hit {
+      background: linear-gradient(145deg, #e67e22, #d35400);
+      align-items: flex-start;
+      padding-left: 25%;
+    }
+
+    .action-rect-btn.hit:active {
+      background: linear-gradient(145deg, #d35400, #e67e22);
+    }
+
+    .action-rect-btn.rage {
+      background: linear-gradient(145deg, #8e44ad, #6c3483);
+      border-radius: 100% 0 0 0;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 50%;
+      height: 80%;
+    }
+
+    .action-rect-btn.rage:active {
+      background: linear-gradient(145deg, #6c3483, #8e44ad);
+    }
+
+    /* Connection Status */
+    .status {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: #95a5a6;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(149, 165, 166, 0.8);
+      animation: pulse-slow 2s infinite;
+      flex-shrink: 0;
+    }
+
+    .status-dot.connected {
+      background: #2ecc71;
+      box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+      animation: pulse-connected 1.5s infinite;
+    }
+
+    .status-dot.disconnected {
+      background: #e74c3c;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+      animation: pulse-slow 2s infinite;
+    }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.95); }
+    }
+
+    @keyframes pulse-connected {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    /* Fullscreen Button */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.1);
+    }
+
+    .fullscreen-btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-feedback {
+      animation: buttonPress 0.15s ease-out;
+    }
+
+    @keyframes buttonPress {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.95); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .action-rect-btn.pressed {
+      transform: scale(0.92);
+      box-shadow: 
+        0 2px 5px rgba(0,0,0,0.5),
+        inset 0 4px 12px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Rotation Warning -->
+  <div id="rotate-warning">
+    <div class="rotate-icon">📱</div>
+    <div class="rotate-text">Please rotate your device to landscape mode</div>
+  </div>
+
+  <!-- Controller -->
+  <div class="controller" id="controller">
+    <!-- Left: D-Pad -->
+    <div class="dpad-section">
+      <div class="dpad">
+        <button class="dpad-btn" data-action="arrow_up">▲</button>
+        <button class="dpad-btn" data-action="arrow_down">▼</button>
+        <button class="dpad-btn" data-action="arrow_left">◀</button>
+        <button class="dpad-btn" data-action="arrow_right">▶</button>
+      </div>
+    </div>
+
+    <!-- Right: Action Buttons -->
+    <div class="action-buttons-area">
+      <!-- Jump Button (Top) -->
+      <button class="action-rect-btn jump" data-action="z">
+        <span class="btn-icon">⬆</span>
+        <span class="btn-label">JUMP</span>
+      </button>
+      
+      <!-- Hit Button (Bottom) -->
+      <button class="action-rect-btn hit" data-action="x">
+        <span class="btn-icon">👊</span>
+        <span class="btn-label">HIT</span>
+      </button>
+      
+      <!-- Rage Button (Overlapping) -->
+      <button class="action-rect-btn rage" data-action="s">
+        <span class="btn-icon">⚡</span>
+        <span class="btn-label">RAGE</span>
+      </button>
+    </div>
+
+    <!-- Status -->
+    <div class="status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Connecting to Streets of Rage 2...</span>
+    </div>
+  </div>
+
+  <!-- Fullscreen Button -->
+  <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
+
+  <script>
+    // Orientation Detection
+    const rotateWarning = document.getElementById('rotate-warning');
+    const controller = document.getElementById('controller');
+
+    function checkOrientation() {
+      if (window.innerHeight > window.innerWidth) {
+        rotateWarning.classList.add('show');
+        controller.classList.remove('show');
+      } else {
+        rotateWarning.classList.remove('show');
+        controller.classList.add('show');
+      }
+    }
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    // Get session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('id') || 'default';
+    console.log('Session ID:', sessionId);
+
+    // Dynamic WebSocket URL
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}`;
+    const socket = new WebSocket(wsUrl);
+    
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    
+    socket.onopen = () => {
+      console.log("Connected to server as Streets of Rage 2 controller");
+      socket.send(`register:controller:streetsofrage2:${sessionId}`);
+      statusDot.classList.remove('disconnected');
+      statusDot.classList.add('connected');
+      statusText.textContent = 'Connected to Streets of Rage 2';
+    };
+    
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      statusDot.classList.remove('connected');
+      statusDot.classList.add('disconnected');
+      statusText.textContent = 'Connection Error';
+    };
+    
+    socket.onclose = () => {
+      console.log("Disconnected from server");
+      statusDot.classList.remove('connected');
+      statusDot.classList.add('disconnected');
+      statusText.textContent = 'Disconnected';
+    };
+
+    function send(action) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(`streetsofrage2:${sessionId}:${action}`);
+      }
+    }
+
+    // Haptic feedback
+    function vibrate(pattern = 50, button = null) {
+      if (navigator.vibrate) {
+        navigator.vibrate(pattern);
+      }
+      if (button) {
+        button.classList.add('btn-feedback');
+        button.classList.add('pressed');
+        setTimeout(() => {
+          button.classList.remove('btn-feedback');
+          button.classList.remove('pressed');
+        }, 150);
+      }
+    }
+
+    // Handle all buttons
+    document.querySelectorAll("button[data-action]").forEach(btn => {
+      const action = btn.dataset.action;
+      if (!action) return;
+
+      const vibrationPattern = action === 's' ? 100 : 50;
+
+      // Desktop
+      btn.addEventListener("mousedown", () => {
+        btn.classList.add('pressed');
+        vibrate(vibrationPattern, btn);
+        send(action + "_down");
+      });
+      btn.addEventListener("mouseup", () => {
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      });
+
+      // Mobile
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        btn.classList.add('pressed');
+        vibrate(vibrationPattern, btn);
+        send(action + "_down");
+      }, { passive: false });
+
+      btn.addEventListener("touchend", e => {
+        e.preventDefault();
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      }, { passive: false });
+
+      btn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        btn.classList.remove('pressed');
+        send(action + "_up");
+      }, { passive: false });
+    });
+
+    // Prevent default touch behaviors
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+
+    // Fullscreen functionality
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    fullscreenBtn.addEventListener('click', () => {
+      vibrate(60, fullscreenBtn);
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Error attempting to enable fullscreen:', err);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fullscreenBtn.textContent = '❐';
+      } else {
+        fullscreenBtn.textContent = '⛶';
+      }
+    });
+  </script>
+</body>
+</html>
+
+

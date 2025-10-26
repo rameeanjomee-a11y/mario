@@ -37,6 +37,10 @@ app.get("/controller6", (req, res) => {
   res.sendFile(path.join(__dirname, "controller6.html"));
 });
 
+app.get("/controller10", (req, res) => {
+  res.sendFile(path.join(__dirname, "controller10.html"));
+});
+
 // Routes for games
 app.get("/mario", (req, res) => {
   res.sendFile(path.join(__dirname, "FullScreenMario-master/Source/index.html"));
@@ -44,6 +48,10 @@ app.get("/mario", (req, res) => {
 
 app.get("/frogs", (req, res) => {
   res.sendFile(path.join(__dirname, "games/frogs/ninja_frog_wars.html"));
+});
+
+app.get("/streetsofrage2", (req, res) => {
+  res.sendFile(path.join(__dirname, "Streets of Rage 2.html"));
 });
 
 // Redirect old routes for backward compatibility
@@ -221,5 +229,10 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`  Example: http://localhost:${PORT}/frogs?id=124`);
   console.log(`           http://localhost:${PORT}/controller2?id=124`);
   console.log(`           http://localhost:${PORT}/controller4?id=124`);
+  console.log(`\nStreets of Rage 2 Game with Session IDs:`);
+  console.log(`  Controller: http://localhost:${PORT}/controller10?id=<SESSION_ID>`);
+  console.log(`  Game: http://localhost:${PORT}/streetsofrage2?id=<SESSION_ID>`);
+  console.log(`  Example: http://localhost:${PORT}/streetsofrage2?id=125`);
+  console.log(`           http://localhost:${PORT}/controller10?id=125`);
   console.log(`\n💡 Each session ID creates an isolated game room!`);
 });

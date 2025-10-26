@@ -18,6 +18,8 @@ COPY controller3.html ./
 COPY controller4.html ./
 COPY controller5.html ./
 COPY controller6.html ./
+COPY controller10.html ./
+COPY "Streets of Rage 2.html" ./
 COPY liara.json ./
 COPY MULTIPLAYER_SESSIONS.md ./
 COPY FullScreenMario-master ./FullScreenMario-master
