@@ -51,7 +51,7 @@ app.get("/frogs", (req, res) => {
 });
 
 app.get("/streetsofrage2", (req, res) => {
-  res.sendFile(path.join(__dirname, "Streets of Rage 2.html"));
+  res.sendFile(path.join(__dirname, "Streets_of_Rage_2.html"));
 });
 
 // Redirect old routes for backward compatibility
