@@ -41,6 +41,10 @@ app.get("/controller10", (req, res) => {
   res.sendFile(path.join(__dirname, "controller10.html"));
 });
 
+app.get("/controller11", (req, res) => {
+  res.sendFile(path.join(__dirname, "controller11.html"));
+});
+
 // Routes for games
 app.get("/mario", (req, res) => {
   res.sendFile(path.join(__dirname, "FullScreenMario-master/Source/index.html"));
@@ -52,6 +56,10 @@ app.get("/frogs", (req, res) => {
 
 app.get("/streetsofrage2", (req, res) => {
   res.sendFile(path.join(__dirname, "Streets_of_Rage_2.html"));
+});
+
+app.get("/smashkarts", (req, res) => {
+  res.sendFile(path.join(__dirname, "smashkarts.html"));
 });
 
 // Redirect old routes for backward compatibility
@@ -100,11 +108,11 @@ wss.on("connection", (ws) => {
         const gameName = parts[2]; // "mario" or "frogs"
         const sessionId = parts[3]; // "123"
         const roomId = `${gameName}:${sessionId}`;
-        
+
         const room = getRoom(roomId);
         ws.roomId = roomId;
         ws.clientType = action;
-        
+
         if (action === "game") {
           room.gameClients.push(ws);
           console.log(`Game client connected to room ${roomId}. Total game clients: ${room.gameClients.length}`);
@@ -118,11 +126,11 @@ wss.on("connection", (ws) => {
         const gameName = parts[2]; // "mario" or "frogs"
         const sessionId = "default";
         const roomId = `${gameName}:${sessionId}`;
-        
+
         const room = getRoom(roomId);
         ws.roomId = roomId;
         ws.clientType = action;
-        
+
         if (action === "game") {
           room.gameClients.push(ws);
           console.log(`[Legacy] Game client connected to room ${roomId}. Total game clients: ${room.gameClients.length}`);
@@ -138,14 +146,14 @@ wss.on("connection", (ws) => {
     if (msg.includes(":")) {
       const firstColon = msg.indexOf(":");
       const secondColon = msg.indexOf(":", firstColon + 1);
-      
+
       if (secondColon > -1) {
         // New format with session ID: "mario:123:jump_down"
         const gameName = msg.substring(0, firstColon);
         const sessionId = msg.substring(firstColon + 1, secondColon);
         const action = msg.substring(secondColon + 1);
         const roomId = `${gameName}:${sessionId}`;
-        
+
         const room = rooms[roomId];
         if (room) {
           room.gameClients.forEach(client => {
@@ -159,7 +167,7 @@ wss.on("connection", (ws) => {
         const gameName = msg.substring(0, firstColon);
         const action = msg.substring(firstColon + 1);
         const roomId = `${gameName}:default`;
-        
+
         const room = rooms[roomId];
         if (room) {
           room.gameClients.forEach(client => {
@@ -196,7 +204,7 @@ wss.on("connection", (ws) => {
           room.controllerClients = room.controllerClients.filter(c => c !== ws);
           console.log(`Controller disconnected from room ${ws.roomId}. Remaining: ${room.controllerClients.length}`);
         }
-        
+
         // Clean up empty rooms
         if (room.gameClients.length === 0 && room.controllerClients.length === 0) {
           delete rooms[ws.roomId];
@@ -234,5 +242,10 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`  Game: http://localhost:${PORT}/streetsofrage2?id=<SESSION_ID>`);
   console.log(`  Example: http://localhost:${PORT}/streetsofrage2?id=125`);
   console.log(`           http://localhost:${PORT}/controller10?id=125`);
+  console.log(`\nSmash Karts Game with Session IDs:`);
+  console.log(`  Controller: http://localhost:${PORT}/controller11?id=<SESSION_ID>`);
+  console.log(`  Game: http://localhost:${PORT}/smashkarts?id=<SESSION_ID>`);
+  console.log(`  Example: http://localhost:${PORT}/smashkarts?id=126`);
+  console.log(`           http://localhost:${PORT}/controller11?id=126`);
   console.log(`\n💡 Each session ID creates an isolated game room!`);
 });

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smash Karts - Remote Controller Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Connection Status Overlay */
+        #connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #95a5a6;
+            box-shadow: 0 0 10px rgba(149, 165, 166, 0.8);
+            animation: pulse-slow 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+            animation: pulse-connected 1.5s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+        }
+
+        @keyframes pulse-slow {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(0.95);
+            }
+        }
+
+        @keyframes pulse-connected {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        #session-info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #session-info strong {
+            color: #f39c12;
+            font-size: 18px;
+        }
+
+        #qr-code {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Game iframe -->
+        <iframe id="game-frame" src="https://www.crazygames.com/game/smash-karts" allowfullscreen
+            allow="gamepad; autoplay; fullscreen">
+        </iframe>
+
+        <!-- Session Info -->
+        <div id="session-info">
+            <div>🎮 <strong>Smash Karts</strong></div>
+            <div>Session ID: <strong id="session-id-display">loading...</strong></div>
+            <div id="qr-code">Open controller on your phone</div>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="connection-status">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">Waiting for WebSocket...</span>
+        </div>
+    </div>
+
+    <script>
+        // Get session ID from URL parameter (e.g., ?id=kart123)
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('id') || 'default';
+
+        console.log(`Smash Karts Game - Session ID: ${sessionId}`);
+
+        // Display session ID
+        document.getElementById('session-id-display').textContent = sessionId;
+
+        // WebSocket connection
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}`;
+        const socket = new WebSocket(wsUrl);
+
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const gameFrame = document.getElementById('game-frame');
+
+        socket.onopen = () => {
+            console.log(`Connected to server (Session: ${sessionId})`);
+            socket.send(`register:game:smashkarts:${sessionId}`);
+
+            statusDot.className = 'status-dot connected';
+            statusText.textContent = '✓ Controller Ready';
+        };
+
+        socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+            statusDot.className = 'status-dot disconnected';
+            statusText.textContent = '✗ Connection Error';
+        };
+
+        socket.onclose = () => {
+            console.log("Disconnected from server");
+            statusDot.className = 'status-dot disconnected';
+            statusText.textContent = '✗ Disconnected';
+        };
+
+        // Handle incoming controller inputs
+        socket.onmessage = (event) => {
+            const action = event.data;
+            console.log(`Received action: ${action}`);
+
+            // Simulate keyboard events in the iframe
+            simulateKeyEvent(action);
+        };
+
+        // Key mapping for WASD + Space
+        const keyMap = {
+            'w_down': { key: 'w', code: 'KeyW', keyCode: 87 },
+            'a_down': { key: 'a', code: 'KeyA', keyCode: 65 },
+            's_down': { key: 's', code: 'KeyS', keyCode: 83 },
+            'd_down': { key: 'd', code: 'KeyD', keyCode: 68 },
+            'space_down': { key: ' ', code: 'Space', keyCode: 32 },
+            'w_up': { key: 'w', code: 'KeyW', keyCode: 87 },
+            'a_up': { key: 'a', code: 'KeyA', keyCode: 65 },
+            's_up': { key: 's', code: 'KeyS', keyCode: 83 },
+            'd_up': { key: 'd', code: 'KeyD', keyCode: 68 },
+            'space_up': { key: ' ', code: 'Space', keyCode: 32 }
+        };
+
+        function simulateKeyEvent(action) {
+            const keyInfo = keyMap[action];
+            if (!keyInfo) {
+                console.warn(`Unknown action: ${action}`);
+                return;
+            }
+
+            const eventType = action.endsWith('_down') ? 'keydown' : 'keyup';
+
+            // Create keyboard event
+            const event = new KeyboardEvent(eventType, {
+                key: keyInfo.key,
+                code: keyInfo.code,
+                keyCode: keyInfo.keyCode,
+                which: keyInfo.keyCode,
+                bubbles: true,
+                cancelable: true
+            });
+
+            // Try to send to iframe (may be blocked by CORS)
+            try {
+                gameFrame.contentWindow.document.dispatchEvent(event);
+            } catch (e) {
+                // If iframe is cross-origin, send to main document
+                document.dispatchEvent(event);
+                window.dispatchEvent(event);
+            }
+
+            console.log(`Simulated ${eventType} for key: ${keyInfo.key}`);
+        }
+
+        // Also listen for keyboard events on this page for testing
+        document.addEventListener('keydown', (e) => {
+            console.log('Key down:', e.key, e.code);
+        });
+
+        document.addEventListener('keyup', (e) => {
+            console.log('Key up:', e.key, e.code);
+        });
+    </script>
+</body>
+
+</html>
