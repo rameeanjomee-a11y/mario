@@ -19,6 +19,8 @@ COPY controller4.html ./
 COPY controller5.html ./
 COPY controller6.html ./
 COPY controller10.html ./
+COPY controller11.html ./
+COPY smashkarts.html ./
 COPY Streets_of_Rage_2.html ./
 COPY liara.json ./
 COPY MULTIPLAYER_SESSIONS.md ./
